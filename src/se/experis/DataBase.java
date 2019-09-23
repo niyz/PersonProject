@@ -1,6 +1,5 @@
 package se.experis;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 
 public class DataBase {
@@ -45,8 +44,37 @@ public class DataBase {
     }
 
     public boolean dbUpdate(String sqlStmt){
-
-        return false;
+        Connection conn = null;
+        boolean isSuccessfull = false;
+        try {
+            conn = dbConnect();
+            PreparedStatement pstmt = conn.prepareStatement(sqlStmt);
+            boolean autoCommit = conn.getAutoCommit();
+            try{
+                conn.setAutoCommit(false);
+                pstmt.executeUpdate();
+                conn.commit();
+                isSuccessfull = true;
+            } catch (SQLException e){
+                System.out.println("Error: SQL commit failed, rolling back");
+                conn.rollback();
+                isSuccessfull = false;
+            } finally {
+                conn.setAutoCommit(autoCommit);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error failed to connect to db");
+            e.printStackTrace();
+        } finally {
+            try{
+                if(conn != null){
+                    conn.close();
+                }
+            } catch (SQLException e){
+                System.out.println("Error: Failed to close db connection");
+            }
+        }
+        return isSuccessfull;
     }
 
     public boolean dbDelete(String sqlStmt){
