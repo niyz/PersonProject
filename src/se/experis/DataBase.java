@@ -43,12 +43,18 @@ public class DataBase {
 
     }
 
-    public boolean dbUpdate(String sqlStmt){
+    public boolean dbPersonUpdate(String person, Person personObj){
         Connection conn = null;
+        Person pObj = personObj;
         boolean isSuccessfull = false;
         try {
             conn = dbConnect();
-            PreparedStatement pstmt = conn.prepareStatement(sqlStmt);
+            String updatePersonSql = "UPDATE person SET personId=?, firstName=?, lastname=?, addressId=?";
+            PreparedStatement pstmt = conn.prepareStatement(updatePersonSql);
+            pstmt.setString(1, pObj.getPersonID());
+            pstmt.setString(2, pObj.getName());
+            pstmt.setString(3, pObj.getLastName());
+            pstmt.setInt(4, Integer.parseInt(pObj.getPersonID()));
             boolean autoCommit = conn.getAutoCommit();
             try{
                 conn.setAutoCommit(false);
