@@ -49,12 +49,53 @@ public class DataBase {
         boolean isSuccessfull = false;
         try {
             conn = dbConnect();
-            String updatePersonSql = "UPDATE person SET personId=?, firstName=?, lastname=?, addressId=?";
+            String updatePersonSql = "UPDATE person SET personId=?, firstName=?, lastname=?, addressId=? WHERE personId=?";
             PreparedStatement pstmt = conn.prepareStatement(updatePersonSql);
             pstmt.setString(1, pObj.getPersonID());
             pstmt.setString(2, pObj.getName());
             pstmt.setString(3, pObj.getLastName());
             pstmt.setInt(4, Integer.parseInt(pObj.getPersonID()));
+            pstmt.setString(5, pObj.getPersonID());
+            boolean autoCommit = conn.getAutoCommit();
+            try{
+                conn.setAutoCommit(false);
+                pstmt.executeUpdate();
+                conn.commit();
+                isSuccessfull = true;
+            } catch (SQLException e){
+                System.out.println("Error: SQL commit failed, rolling back");
+                conn.rollback();
+                isSuccessfull = false;
+            } finally {
+                conn.setAutoCommit(autoCommit);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error failed to connect to db");
+            e.printStackTrace();
+        } finally {
+            try{
+                if(conn != null){
+                    conn.close();
+                }
+            } catch (SQLException e){
+                System.out.println("Error: Failed to close db connection");
+            }
+        }
+        return isSuccessfull;
+    }
+
+    public boolean dbEmailUpdate(String person, Person personObj){
+        Connection conn = null;
+        Person pObj = personObj;
+        boolean isSuccessfull = false;
+        try {
+            conn = dbConnect();
+            String updatePersonSql = "UPDATE email SET email=? WHERE personId=? AND email=?"; // check stmt
+            PreparedStatement pstmt = conn.prepareStatement(updatePersonSql);
+            //TODO: fix email get below?
+            //pstmt.setString(1, pObj.getEmail()); // new email..
+            //pstmt.setInt(2, Integer.parseInt(pObj.getPersonID())); // primary key id
+            //pstmt.setString(3, pObj.getEmail()); // old email
             boolean autoCommit = conn.getAutoCommit();
             try{
                 conn.setAutoCommit(false);
