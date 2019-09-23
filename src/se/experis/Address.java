@@ -18,4 +18,19 @@ public class Address {
     public void printAddress() {
         System.out.println("Country:" + country + "City:" + city + "Street:" + street + "Street number:" +  streetNum + "Postal code:" + postalCode);
     }
+    public String getCountry() {
+    	return this.country;
+    }
+    public String getCity() {
+    	return this.city;
+    }
+    public String getStreet() {
+    	return this.street;
+    }
+    public String getStreetNum() {
+    	return this.streetNum;
+    }
+    public String getPostalCode() {
+    	return this.postalCode;
+    }
 }

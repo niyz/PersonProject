@@ -5,32 +5,53 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class databaseFunctions {
 
 	public static void main(String[] args) throws SQLException {
 		
-		insert("INSERT INTO person(firstName,lastName)");
+		
 		
 	}
-	public static void select(String sql) {
-			try (Connection conn = connect();
-				Statement stmt  = conn.createStatement();
-				ResultSet rs    = stmt.executeQuery(sql)){
-	            
-	            
-	            while (rs.next()) {
-	                System.out.print("Country: "+rs.getString("country")+", City: "+rs.getString("city")+", Street: "+rs.getString("street")+"\n");
-	            }
-	        } catch (SQLException e) {
-	            System.out.println(e.getMessage());
-	        }
+	public static String select(String sql) {
+		String info = "";	
+		try (Connection conn = connect();
+			Statement stmt  = conn.createStatement();
+			ResultSet rs    = stmt.executeQuery(sql)){
+	        
+			info = rs.toString();
+			/*while (rs.next()) {
+				info+=rs.getString("id");
+	        }*/
+		}
+	    catch (SQLException e) {
+	    	System.out.println(e.getMessage());
+	    }	
+		return info;
 	}
-	public static void insert(String sql) {
+	public static void insertPerson(Person person) {
+		
+		String personInfo = "INSERT INTO person(personID,firstName,lastName,phoneNumber,adressID) "
+				+ "VALUES('"+person.getPersonID()+"','"+person.getName()+"','"+person.getLastName()+"')";
+		
+		executeInsertSQL(personInfo);
+		
+		ArrayList<String> phoneNums = person.getPhoneIDList();
+		Address adress = person.getAddress();
+		
+		String ID = "SELECT id FROM person WHERE personID="+person.getPersonID();
+		for(String num:person.getPhoneIDList()) {
+			executeInsertSQL("INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+num+"')");
+		}
+		for(String email:person.getEmailList()) {
+			executeInsertSQL("INSERT INTO email(email,personID) VALUES('"+email+"','"+ID+"')");
+		}
+		
+		
+	}
+	private static void executeInsertSQL(String sql) {
 		Connection conn = connect();
-		
-		//String sql = "INSERT INTO adress(country,city,street,streetNum,postalCode) VALUES('Sweden','Växjö','Storgatan','1','35246')";
-		
 		boolean autoCommit = false;
 		try{
 			autoCommit = conn.getAutoCommit();

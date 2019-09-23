@@ -7,7 +7,8 @@ public class Person {
     private String personID;
     private String lastName;
     private ArrayList<String>  phoneIDList;
-    Address address;
+    private ArrayList<String> emailList;
+    private Address address;
 
     //TODO: Add address and its constructor
 
@@ -46,5 +47,8 @@ public class Person {
     public Address getAddress()
     {
         return this.address;
+    }
+    public ArrayList<String> getEmailList(){
+    	return this.emailList;
     }
 }
