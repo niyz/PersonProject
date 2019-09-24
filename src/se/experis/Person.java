@@ -12,11 +12,12 @@ public class Person {
 
     //TODO: Add address and its constructor
 
-    Person(String name, String personID, String lastName, ArrayList<String> phoneIDList, Address address){
+    Person(String name, String personID, String lastName, ArrayList<String> phoneIDList, ArrayList<String> emailList, Address address){
         this.name = name;
         this.personID = personID;
         this.lastName = lastName;
-        this.phoneIDList = new ArrayList<String>(phoneIDList);
+        this.phoneIDList = phoneIDList;
+        this.emailList = emailList;
         this.address = address;
     }
 
