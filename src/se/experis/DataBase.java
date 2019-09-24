@@ -10,7 +10,7 @@ public class DataBase {
     public Connection dbConnect() throws SQLException{
         Connection conn = null;
 
-        String dbUrl = "jdbc:sqlite::resource:"; // add dbname.
+        String dbUrl = "jdbc:sqlite::resource:Task17DB.db"; // add dbname.
         conn = DriverManager.getConnection(dbUrl);
         return conn;
     }
@@ -25,6 +25,7 @@ public class DataBase {
         Address addr = new Address("SWE","Vaxjo","Gatan","1","1234");
         ArrayList<Person> pList = new ArrayList<>();
         ArrayList<String> phlist = new ArrayList<>();
+        ArrayList<String> mailList = new ArrayList<>();
         try{
             conn = dbConnect();
             Statement stmt = conn.createStatement();
@@ -40,7 +41,7 @@ public class DataBase {
                         result.getString("LastName"));
                 p = new Person(result.getString("FirstName"),
                         result.getString("personid"),
-                        result.getString("LastName"), phlist, addr);
+                        result.getString("LastName"), phlist,mailList, addr);
                 pList.add(p);
 
             }
@@ -232,11 +233,11 @@ public class DataBase {
             conn = this.dbConnect();
             conn.setAutoCommit(false);
             pAddr = conn.prepareStatement(sqlAddress, Statement.RETURN_GENERATED_KEYS);
-            pAddr.setString(1, p.address.getCountry());
-            pAddr.setString(2, p.address.getCity());
-            pAddr.setString(3, p.address.getStreet());
-            pAddr.setString(4, p.address.getStreetNum());
-            pAddr.setString(5, p.address.getPostalCode());
+            pAddr.setString(1, p.getAddress().getCountry());
+            pAddr.setString(2, p.getAddress().getCity());
+            pAddr.setString(3, p.getAddress().getStreet());
+            pAddr.setString(4, p.getAddress().getStreetNum());
+            pAddr.setString(5, p.getAddress().getPostalCode());
 
             int rowsAffected = pAddr.executeUpdate();
             System.out.println("pAddr: " + rowsAffected);
