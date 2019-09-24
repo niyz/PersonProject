@@ -11,15 +11,8 @@ public class databaseFunctions {
 
 	public static void main(String[] args) {
 		
-		/*
-		ArrayList<String> phoneNumbers = new ArrayList<String>();
-		phoneNumbers.add("0703333333");
-		phoneNumbers.add("0708888888");
-		Address address = new Address("Sweden","Växjö","Storgatan","2","35263");
 		
-		Person person = new Person("Sven","199012111337","Johansson",phoneNumbers,address);
 		
-		insertPerson(person);*/
 		
 		
 	}
