@@ -16,6 +16,7 @@ public class databaseFunctions {
 		
 		
 	}
+
 	public static void updatePerson(Person oldPerson, Person newPerson) {
 		Connection conn = connect();
 		
@@ -99,54 +100,56 @@ public class databaseFunctions {
 	        
 		return ids;
 	}
-	public static String selectAdressID(Connection conn, String sql) {
-		String info = "";	
+	private static String selectAdressID(Connection conn, String sql) {
+		String info = "";
+
 		//Connection conn = connect();
 		Statement stmt;
 		ResultSet rs = null;
 		try {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
-			
+
 			//info=rs.getString("adressID");
 			while (rs.next()) {
                 info=rs.getString("adressID");
             }
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	        
+
 		return info;
 	}
-	public static String selectAnID(Connection conn, String sql) {
-		String info = "";	
+	private static String selectAnID(Connection conn, String sql) {
+		String info = "";
 		//Connection conn = connect();
 		Statement stmt;
 		ResultSet rs = null;
 		try {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
-			
+
 			info=rs.getString("id");
 			/*while (rs.next()) {
                 info=rs.getString("id");
             }*/
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	        
+
 		return info;
 	}
+
 	private static int getAddressIdOrAdd(Connection conn, Address address) {
-		
+
 		String getAddressIdString = "SELECT adressID FROM adress WHERE country='"+address.getCountry()+
 				"' AND city='"+address.getCity()+"' AND street='"+address.getStreet()+
 				"' AND streetNum='"+address.getStreetNum()+"' AND postalCode='"+address.getPostalCode()+"'";
-		
+
 		String addressID = selectAdressID(conn,getAddressIdString);
 		if(addressID.equals("")) {
 			String insertAddress = "INSERT INTO adress(country,city,street,streetNum,postalCode) VALUES('"+
@@ -166,7 +169,7 @@ public class databaseFunctions {
 			conn.setAutoCommit(false);
 			Statement pstmt = conn.createStatement();
 			pstmt.executeUpdate(sql);
-        } 
+        }
 		catch (SQLException e) {
 			try {
 				conn.rollback();
@@ -185,6 +188,12 @@ public class databaseFunctions {
 			}
 		}
 	}
+
+
+
+
+
+
 	public static Connection connect() {
 		String url = "jdbc:sqlite::resource:Task17DB.db";
         

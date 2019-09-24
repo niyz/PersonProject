@@ -10,310 +10,226 @@ public class DataBase {
     public Connection dbConnect() throws SQLException{
         Connection conn = null;
 
-        String dbUrl = "jdbc:sqlite::resource:Task17DB.db"; // add dbname.
-        conn = DriverManager.getConnection(dbUrl);
+        try {
+            String dbUrl = "jdbc:sqlite::resource:Task17DB.db"; // add dbname.
+            conn = DriverManager.getConnection(dbUrl);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return conn;
     }
 
-    public void dbCreate(){ // booleand?
-
-    }
-
-    public ArrayList<Person> dbRead(String searchStrSql){
-        Connection conn = null;
-        Person p;
-        Address addr = new Address("SWE","Vaxjo","Gatan","1","1234");
-        ArrayList<Person> pList = new ArrayList<>();
-        ArrayList<String> phlist = new ArrayList<>();
-        ArrayList<String> mailList = new ArrayList<>();
-        try{
-            conn = dbConnect();
-            Statement stmt = conn.createStatement();
-            ResultSet result = stmt.executeQuery(searchStrSql);
-            while(result.next()){
-                //do shit with the stuff..
-                System.out.printf("id: %s" +
-                                "\tpersonId: %s" +
-                                "\tFirstName: %s" +
-                                "\tLastName: %s", result.getString("id"),
-                        result.getString("personid"),
-                        result.getString("FirstName"),
-                        result.getString("LastName"));
-                p = new Person(result.getString("FirstName"),
-                        result.getString("personid"),
-                        result.getString("LastName"), phlist,mailList, addr);
-                pList.add(p);
-
-            }
-            System.out.println("plist size: " + pList.size());
-        } catch (SQLException e) {
-            System.out.println("Error: failed to connect to db");
-            e.printStackTrace();
-        } finally {
-            try{
-                if(conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Error: Failed to close db connection");
-                e.printStackTrace();
-            }
-        }
-
-        return pList;
-
-    }
-
-    public boolean dbPersonUpdate(String person, Person personObj){
-        Connection conn = null;
-        Person pObj = personObj;
-        boolean isSuccessfull = false;
-        try {
-            conn = dbConnect();
-            String updatePersonSql = "UPDATE person SET personId=?, firstName=?, lastname=?, addressId=? WHERE personId=?";
-            PreparedStatement pstmt = conn.prepareStatement(updatePersonSql);
-            pstmt.setString(1, pObj.getPersonID());
-            pstmt.setString(2, pObj.getName());
-            pstmt.setString(3, pObj.getLastName());
-            pstmt.setInt(4, Integer.parseInt(pObj.getPersonID()));
-            pstmt.setString(5, pObj.getPersonID());
-            boolean autoCommit = conn.getAutoCommit();
-            try{
-                conn.setAutoCommit(false);
-                pstmt.executeUpdate();
-                conn.commit();
-                isSuccessfull = true;
-            } catch (SQLException e){
-                System.out.println("Error: SQL commit failed, rolling back");
-                conn.rollback();
-                isSuccessfull = false;
-            } finally {
-                conn.setAutoCommit(autoCommit);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error failed to connect to db");
-            e.printStackTrace();
-        } finally {
-            try{
-                if(conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e){
-                System.out.println("Error: Failed to close db connection");
-            }
-        }
-        return isSuccessfull;
-    }
-
-    public boolean dbEmailUpdate(String person, Person personObj){
-        Connection conn = null;
-        Person pObj = personObj;
-        boolean isSuccessfull = false;
-        try {
-            conn = dbConnect();
-            String updatePersonSql = "UPDATE email SET email=? WHERE personId=? AND email=?"; // check stmt
-            PreparedStatement pstmt = conn.prepareStatement(updatePersonSql);
-            //TODO: fix email get below?
-            //pstmt.setString(1, pObj.getEmail()); // new email..
-            //pstmt.setInt(2, Integer.parseInt(pObj.getPersonID())); // primary key id
-            //pstmt.setString(3, pObj.getEmail()); // old email
-            boolean autoCommit = conn.getAutoCommit();
-            try{
-                conn.setAutoCommit(false);
-                pstmt.executeUpdate();
-                conn.commit();
-                isSuccessfull = true;
-            } catch (SQLException e){
-                System.out.println("Error: SQL commit failed, rolling back");
-                conn.rollback();
-                isSuccessfull = false;
-            } finally {
-                conn.setAutoCommit(autoCommit);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error failed to connect to db");
-            e.printStackTrace();
-        } finally {
-            try{
-                if(conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e){
-                System.out.println("Error: Failed to close db connection");
-            }
-        }
-        return isSuccessfull;
-    }
-
-    public boolean dbDelete(String sqlStmt){
+    public boolean dbDelete(Person pObj){
 
         return false;
     }
 
-    public boolean dbAddNew(Person p){
+    public void dbUpdate(Person pObj){
+
+    }
+
+    /**
+     * 1 = dad
+     * 2 = mom
+     * 3 = son
+     * 4 = daughter
+     * 5 = brother
+     * 6 = sister
+     */
+
+    public void addRelation(Person pObj, String otherPnummer, int relation){
+
+    }
+
+    public ArrayList<Person> dbSearch(String searchStr){ // search for phone number or email address dont work...
+        ArrayList<Person> personList = new ArrayList<>();
+        ArrayList<String> mailList = new ArrayList<>();
+        ArrayList<String> phoneList = new ArrayList<>();
+        String searchPersonSql = "SELECT * FROM person WHERE firstname OR lastname LIKE ?";
+        String searchAddressSql= "SELECT * FROM adress WHERE adressid = ?";
+        String searchPhoneSql = "SELECT * FROM phone WHERE personid = ?";
+        String searchEmailSql = "SELECT * FROM email WHERE personid = ?";
+        String searhcRelSql = "SELECT * FROM relationship WHERE person1 = ? OR person2 = ?";
         Connection conn = null;
-        boolean isSuccessful = false;
-        System.out.println("dbAddNew(Person p)");
-        p.personToString();
-        System.out.println();
-        int rowsInserted = 0;
-        String insertPersonSql = "INSERT INTO person(personID,firstName,lastName,addressid) VALUES(?,?,?,?)"; // check stmt
-        //String insertAddressSql = "INSERT INTO adress(country,city,street,streetNum,postalCode) VALUES(?,?,?,?,?)";
+        Person pObj;
+        Address addr = null;
         try {
             conn = this.dbConnect();
-            /*String insertPhoneSql = "INSERT INTO phone (personID, phone) " +
-                    "VALUES (?, ?)";*/
-            PreparedStatement prePerson = conn.prepareStatement(insertPersonSql);
-            prePerson.setString(1, p.getPersonID());
-            prePerson.setString(2, p.getName());
-            prePerson.setString(3, p.getLastName());
-            prePerson.setInt(4,1);
+            PreparedStatement prePersonSearch = conn.prepareStatement(searchPersonSql, Statement.RETURN_GENERATED_KEYS);
+            prePersonSearch.setString(1, "%" + searchStr + "%");
+            ResultSet personResult = prePersonSearch.executeQuery();
+            int personID = personResult.getInt("adressid");
 
-            /*PreparedStatement prePhone = conn.prepareStatement(insertPhoneSql);
-            prePhone.setInt(1, 1);//hämta id för person... hur?
-            prePhone.setString(2, p.getPhoneIDList().get(0));*/
-
-            /*PreparedStatement preAddr = conn.prepareStatement(insertAddressSql);
-            preAddr.setString(1, p.address.getCountry());
-            preAddr.setString(2, p.address.getCity());
-            preAddr.setString(3, p.address.getStreet());
-            preAddr.setString(4, p.address.getStreetNum());
-            preAddr.setString(5, p.address.getPostalCode());*/
-
-            boolean autoCommit = conn.getAutoCommit();
-            System.out.println("autocommit: " + autoCommit);
-            try{
-                conn.setAutoCommit(false);
-
-                System.out.println("Attempting to add person to database.");
-                rowsInserted = prePerson.executeUpdate();
-               /* System.out.println("Attempting to add persons address to db");
-                preAddr.executeUpdate();*/
-                System.out.println("commiting changes");
-                conn.commit();
-                System.out.println(rowsInserted);
-                isSuccessful = true;
-                System.out.println("Added Person successfully!");
-            } catch (SQLException e){
-                System.out.println("Error: SQL commit failed, rolling back");
-                conn.rollback();
-                isSuccessful = false;
-            } finally {
-                conn.setAutoCommit(autoCommit);
-                System.out.println("in finally...");
-            }
-        } catch (SQLException e) {
-            System.out.println("Error failed to connect to db");
-            e.printStackTrace();
-        } finally {
-            try{
-                if(conn != null){
-                    conn.close();
-                    System.out.println("Closing DB connection");
-                }
-            } catch (SQLException e){
-                System.out.println("Error: Failed to close db connection");
-            }
-        }
-
-
-        return isSuccessful;
-    }
-
-    public boolean add(Person p){
-        boolean isSuccessful = false;
-        String sqlAddress = "INSERT INTO address(country,city,street,streetNum,postalCode) VALUES(?,?,?,?,?)";
-        String sqlPerson = "INSERT INTO person(personid,firstname,lastname,addressid) VALUES(?,?,?,?)";
-
-        ResultSet rs = null;
-        Connection conn = null;
-        PreparedStatement pAddr = null, pPers = null;
-
-        try{
-            conn = this.dbConnect();
-            conn.setAutoCommit(false);
-            pAddr = conn.prepareStatement(sqlAddress, Statement.RETURN_GENERATED_KEYS);
-            pAddr.setString(1, p.getAddress().getCountry());
-            pAddr.setString(2, p.getAddress().getCity());
-            pAddr.setString(3, p.getAddress().getStreet());
-            pAddr.setString(4, p.getAddress().getStreetNum());
-            pAddr.setString(5, p.getAddress().getPostalCode());
-
-            int rowsAffected = pAddr.executeUpdate();
-            System.out.println("pAddr: " + rowsAffected);
-            rs = pAddr.getGeneratedKeys();
-            int addressID = 0;
-            if(rs.next()){
-                addressID = rs.getInt(1);
-                System.out.println("addressid: " + addressID);
+            PreparedStatement preAddrSearch = conn.prepareStatement(searchAddressSql, Statement.RETURN_GENERATED_KEYS);
+            preAddrSearch.setInt(1, personID);
+            ResultSet addrResult = preAddrSearch.executeQuery();
+            while(addrResult.next()){ // add address to address object that then is beeing put into person object..
+                addr = new Address(
+                        addrResult.getString("country"),
+                        addrResult.getString("city"),
+                        addrResult.getString("street"),
+                        addrResult.getString("streetNum"),
+                        addrResult.getString("postalcode")
+                        );
             }
 
-            if(rowsAffected != 1){
-                System.out.println("Failed pAddr statement rolling back");
-                conn.rollback();
+            PreparedStatement prePhoneSearch = conn.prepareStatement(searchPhoneSql);
+            prePhoneSearch.setInt(1, personID);
+            ResultSet phoneResult = prePhoneSearch.executeQuery();
+            while(phoneResult.next()){
+                phoneList.add(phoneResult.getString("phone"));
             }
 
-            //insert person
-            System.out.println("Trying to insert person");
-            pPers = conn.prepareStatement(sqlPerson);
-            pPers.setString(1, p.getPersonID());
-            pPers.setString(2, p.getName());
-            pPers.setString(3, p.getLastName());
-            pPers.setInt(4, addressID);
+            PreparedStatement preEmailSearch = conn.prepareStatement(searchEmailSql);
+            preEmailSearch.setInt(1, personID);
+            ResultSet emailResult = preEmailSearch.executeQuery();
 
-            int personRows = pPers.executeUpdate();
+            while(emailResult.next()){
+                mailList.add(emailResult.getString("email"));
+            }
 
-            System.out.println("person rows: " + personRows);
-            if(personRows != 1){
-                System.out.println("pPers statment failed rolling back");
-                conn.rollback();
+            while(personResult.next()){
+                pObj = new Person(
+                        personResult.getString("firstname"),
+                        personResult.getString("personid"),
+                        personResult.getString("lastname"),
+                        phoneList,
+                        mailList,
+                        addr
+                        );
+
+                personList.add(pObj);
 
             }
-            System.out.println("Commiting changes to the database.");
-            conn.commit();
-            System.out.println("Commit finished");
-            isSuccessful = true;
+
 
         } catch (SQLException e){
-            try{
-                if(conn != null){
-                    conn.rollback();
-                    System.out.println("ERROR: SQLException conn != null rolling back.");
-                }
-            } catch (SQLException e2){
-                System.out.println("ERROR: rollback failed");
-                System.out.println(e2.getMessage());
-            }
-            System.out.println("Error on sql exept. while trying to commit statements?");
+            System.out.println("Error: SQL Exception");
             System.out.println(e.getMessage());
-        } finally {
-            try{
-                if(rs != null){
-                    rs.close();
-                }
-                if(pAddr != null){
-                    pAddr.close();
-                }
-                if(pPers != null){
-                    pPers.close();
-                }
-                if(conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e){
-                System.out.println("rs,pAddr,pPers or conn is not null and had to be closed");
-                System.out.println(e.getMessage());
-            }
         }
 
-        return isSuccessful;
+        return personList;
     }
 
-    public ArrayList<Person> dbSearch(String searchStr){
-        ArrayList<Person> personList = new ArrayList<>();
 
+    /**
+     * Elliot shit
+     */
+    public void insertPerson(Person person) throws SQLException{
 
+        Connection conn = this.dbConnect();
 
-        return personList;
+        int adressID = getAddressIdOrAdd(conn,person.getAddress());
+
+        String personInfo = "INSERT INTO person(personID,firstName,lastName,adressID) "
+                + "VALUES('"+person.getPersonID()+"','"+person.getName()+"','"+person.getLastName()+"','"+adressID+"')";
+
+        executeInsertSQL(conn,personInfo);
+
+        String getIDString = "SELECT id FROM person WHERE personID='"+person.getPersonID()+"'";
+
+        String ID = selectAnID(conn,getIDString);
+
+        for(String num:person.getPhoneIDList()) {
+            executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+num+"')");
+        }
+
+        for(String email:person.getEmailList()) {
+            executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+email+"','"+ID+"')");
+        }
+    }
+
+    /**
+     * Help methods to insertPerson
+     */
+
+    private static String selectAdressID(Connection conn, String sql) {
+        String info = "";
+        //Connection conn = connect();
+        Statement stmt;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            //info=rs.getString("adressID");
+            while (rs.next()) {
+                info=rs.getString("adressID");
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return info;
+    }
+
+    private static String selectAnID(Connection conn, String sql) {
+        String info = "";
+        //Connection conn = connect();
+        Statement stmt;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            info=rs.getString("id");
+			/*while (rs.next()) {
+                info=rs.getString("id");
+            }*/
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return info;
+    }
+
+    private static int getAddressIdOrAdd(Connection conn, Address address) {
+
+        String getAddressIdString = "SELECT adressID FROM adress WHERE country='"+address.getCountry()+
+                "' AND city='"+address.getCity()+"' AND street='"+address.getStreet()+
+                "' AND streetNum='"+address.getStreetNum()+"' AND postalCode='"+address.getPostalCode()+"'";
+
+        String addressID = selectAdressID(conn,getAddressIdString);
+        if(addressID.equals("")) {
+            String insertAddress = "INSERT INTO adress(country,city,street,streetNum,postalCode) VALUES('"+
+                    address.getCountry()+"','"+address.getCity()+"','"+address.getStreet()+"','"+address.getStreetNum()+"','"+
+                    address.getPostalCode()+"')";
+            executeInsertSQL(conn,insertAddress);
+            addressID = selectAdressID(conn,getAddressIdString);
+        }
+        int result = Integer.parseInt(addressID);
+        return result;
+    }
+
+    private static void executeInsertSQL(Connection conn, String sql) {
+        //Connection conn = connect();
+        boolean autoCommit = false;
+        try{
+            autoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            Statement pstmt = conn.createStatement();
+            pstmt.executeUpdate(sql);
+        }
+        catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                conn.setAutoCommit(autoCommit);
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -1,17 +1,18 @@
 package se.experis;
 
 import java.sql.*;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         boolean keepRunning = true;
         //Create instance of database
         DataBase db = new DataBase();
         //Create phoneList and populate it
-        ArrayList<String> phoneNumbers_p1 = new ArrayList<String>();
+        /*ArrayList<String> phoneNumbers_p1 = new ArrayList<String>();
         phoneNumbers_p1.add("0700000");
         phoneNumbers_p1.add("0700001");
         ArrayList<String> phoneNumbers_p2 = new ArrayList<String>();
@@ -33,26 +34,31 @@ public class Main {
         ArrayList<Person> personList = new ArrayList<Person>();
         //add person
         personList.add(p1);
+        db.insertPerson(p1);
         personList.add(p2);
-
+        db.insertPerson(p2);*/
+        Person returnAbleSearch;
 
         String input;
         while (keepRunning) {
-            System.out.println("\nCreate, read, update or delete?\nExit to stop");
+            System.out.println("\nAdd or search for person?\nExit to stop");
+            System.out.println("Enter the digit for the corresponding choice: \n[1]: Exit\n[2]: Add\n[3]: Search");
+
 
             Scanner in = new Scanner(System.in);
             input = in.nextLine().toLowerCase();
             switch (input) {
-                case "create":
+                case "2":
                     System.out.println("In create");
                     Person pNew = createPersonObject();
                     //TODO: Insert to database when Elliot is done with the function
                     //For now: Update personList
-                    personList.add(pNew);
+                    //personList.add(pNew);
+                    db.insertPerson(pNew);
                     break;
-                case "read":
+                case "3":
                     System.out.println("In read.. Ongoing implementation");
-                    readPersonObjectFromDB(personList);
+                    returnAbleSearch = readPersonObjectFromDB(db);
                     break;
                 case "update":
                     System.out.println("In update");
@@ -60,6 +66,25 @@ public class Main {
                     break;
                 case "delete":
                     System.out.println("In delete");
+                    break;
+                case "search":
+                    System.out.print("Search for name: ");
+                    input = in.nextLine();
+                    ArrayList<Person> p = db.dbSearch(input);
+                    for (Person per : p) {
+                        per.personToString();
+                        System.out.println("---- Phone ----");
+                        for(String phone : per.getPhoneIDList()){
+                            System.out.println(phone);
+                        }
+                        System.out.println("---- Email ----");
+                        for(String email : per.getEmailList()){
+                            System.out.println(email);
+                        }
+                        System.out.println("---- Address ----");
+                        per.getAddress().printAddress();
+
+                    }
                     break;
                 case "exit":
                     keepRunning = false;
@@ -107,33 +132,46 @@ public class Main {
 
         return p1;
     }
-    private static void readPersonObjectFromDB(ArrayList<Person> personList){
+    private static Person readPersonObjectFromDB(DataBase db){
         Scanner in = new Scanner(System.in);
         ArrayList<Person> listOfFoundPersons = new ArrayList<Person>();
-        String searchable;
-        System.out.println("Search query: ");
-        Person personToReturn;
-        searchable = in.nextLine();
-        //TODO: Anrop till db search funktion
-        for (Person per: personList) {
-            if (per.getEmailList().contains(searchable) || per.getPersonID().contains(searchable) || per.getLastName().contains(searchable)
-            || per.getName().contains(searchable) || per.getAddress().toString().contains(searchable)
-                    || per.getPhoneIDList().toString().contains(searchable))
+        String searchable, choosePerson, choice;
+        int chosenPerson;
+        Person returnable = null;
+        boolean run = true;
+
+        System.out.println("Enter the digit for the correspoding choice: \n[1]: Back\n[2]: Search");
+        choice = in.nextLine();
+        while(run){
+
+            if (choice.equals("1"))
             {
-                System.out.println("SUCCESS");
-                listOfFoundPersons.add(per);
-            }else{
-                System.out.println("FAIL");
+                run = false;
+
+            }else if (choice.equals("2")) {
+                System.out.println("Enter search string: \n");
+                searchable = in.nextLine();
+                listOfFoundPersons = db.dbSearch(searchable);
+                System.out.println(listOfFoundPersons.size());
+                if (listOfFoundPersons.size() > 0){
+
+                    for (int i = 0; i < listOfFoundPersons.size(); i++) {
+                        System.out.println(i + " : ");
+                        listOfFoundPersons.get(i).personToString();
+                    }
+                    System.out.println("Enter the preceding digit to choose person");
+                    choosePerson = in.nextLine();
+                    chosenPerson = Integer.parseInt(choosePerson);
+                    returnable = listOfFoundPersons.get(chosenPerson);
+                }else{
+                    System.out.println("No hit..");
+                }
+                run = false;
+
             }
         }
-        //Db.search-någonting.
 
-
-        for (Person p: listOfFoundPersons
-             ) {
-            p.personToString();
-
-        }
+        return returnable;
 
     }
     private static Person updatePersonToDatabase(){
