@@ -7,37 +7,39 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-	    Boolean keepRunning =  true;
+        Boolean keepRunning = true;
 
         String input;
-        //System.out.println("Create, read, update or delete?");
-        //input = in.nextLine().toLowerCase();
-    while (keepRunning)
-        System.out.println("Create, read, update or delete?\nExit to stop");
+        while (keepRunning) {
+            System.out.println("Create, read, update or delete?\nExit to stop");
 
-        Scanner in = new Scanner(System.in);
-        input = in.nextLine().toLowerCase();
-        switch(input)
-        {
-            case "create":
-                System.out.println("In create");
-                Person p1 = createPersonObject();
-                p1.personToString();
-                break;
-            case "read":
-                System.out.println("In read");
-                break;
-            case "update":
-                System.out.println("In update");
-            case "delete":
-                System.out.println("In delete");
-            case "exit":
-                keepRunning = false;
-                System.out.println("Exiting..");
-            default:
-                System.out.println("Default");
+            Scanner in = new Scanner(System.in);
+            input = in.nextLine().toLowerCase();
+            switch (input) {
+                case "create":
+                    System.out.println("In create");
+                    Person p1 = createPersonObject();
+                    p1.personToString();
+                    break;
+                case "read":
+                    System.out.println("In read");
+                    break;
+                case "update":
+                    System.out.println("In update");
+                    break;
+                case "delete":
+                    System.out.println("In delete");
+                    break;
+                case "exit":
+                    keepRunning = false;
+                    System.out.println("Exiting..");
+                    break;
+                default:
+                    System.out.println("Default");
+                    break;
+            }
+
         }
-
     }
 
     private static Person createPersonObject(){
