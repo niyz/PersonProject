@@ -39,7 +39,7 @@ public class Main {
 
         String input;
         while (keepRunning) {
-            System.out.println("\nCreate, read, update or delete?\nExit to stop");
+            System.out.println("\nCreate, read, search, update or delete?\nExit to stop");
 
             Scanner in = new Scanner(System.in);
             input = in.nextLine().toLowerCase();
@@ -61,6 +61,11 @@ public class Main {
                     break;
                 case "delete":
                     System.out.println("In delete");
+                    break;
+                case "search":
+                    System.out.print("Search for name: ");
+                    input = in.nextLine();
+                    db.dbSearch(input);
                     break;
                 case "exit":
                     keepRunning = false;
