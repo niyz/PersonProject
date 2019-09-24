@@ -45,7 +45,7 @@ public class DataBase {
         ArrayList<Person> personList = new ArrayList<>();
         ArrayList<String> mailList = new ArrayList<>();
         ArrayList<String> phoneList = new ArrayList<>();
-        String searchPersonSql = "SELECT * FROM person WHERE firstname OR lastname LIKE ?";
+        String searchPersonSql = "SELECT * FROM person WHERE firstname LIKE ? OR lastname LIKE ?";
         String searchAddressSql= "SELECT * FROM adress WHERE adressid = ?";
         String searchPhoneSql = "SELECT * FROM phone WHERE personid = ?";
         String searchEmailSql = "SELECT * FROM email WHERE personid = ?";
@@ -57,11 +57,13 @@ public class DataBase {
             conn = this.dbConnect();
             PreparedStatement prePersonSearch = conn.prepareStatement(searchPersonSql, Statement.RETURN_GENERATED_KEYS);
             prePersonSearch.setString(1, "%" + searchStr + "%");
+            prePersonSearch.setString(2, "%" + searchStr + "%");
             ResultSet personResult = prePersonSearch.executeQuery();
             int personID = personResult.getInt("adressid");
 
             PreparedStatement preAddrSearch = conn.prepareStatement(searchAddressSql, Statement.RETURN_GENERATED_KEYS);
             preAddrSearch.setInt(1, personID);
+            //preAddrSearch
             ResultSet addrResult = preAddrSearch.executeQuery();
             while(addrResult.next()){ // add address to address object that then is beeing put into person object..
                 addr = new Address(
@@ -72,9 +74,10 @@ public class DataBase {
                         addrResult.getString("postalcode")
                         );
             }
-
+            //System.out.println("\t\t" + Integer.parseInt(searchStr));
             PreparedStatement prePhoneSearch = conn.prepareStatement(searchPhoneSql);
             prePhoneSearch.setInt(1, personID);
+            //prePersonSearch.setString(2, "%" + searchStr + "%");
             ResultSet phoneResult = prePhoneSearch.executeQuery();
             while(phoneResult.next()){
                 phoneList.add(phoneResult.getString("phone"));
