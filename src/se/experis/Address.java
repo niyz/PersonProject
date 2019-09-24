@@ -7,7 +7,7 @@ public class Address {
     private String streetNum;
     private String postalCode;
 
-    Address (String country, String city, String street, String streetNum, String postalCode) {
+    Address(String country, String city, String street, String streetNum, String postalCode) {
         this.country = country;
         this.city = city;
         this.street = street;
@@ -16,8 +16,10 @@ public class Address {
     }
 
     public void printAddress() {
-        System.out.println("Country:" + country + "City:" + city + "Street:" + street + "Street number:" +  streetNum + "Postal code:" + postalCode);
+        System.out.println("\nCountry: " + country + "\nCity: " + city + "\nStreet: " + street +
+                "\nStreet number: " + streetNum + "\nPostal code: " + postalCode);
     }
+
     public String getCountry() {
     	return this.country;
     }
@@ -33,4 +35,6 @@ public class Address {
     public String getPostalCode() {
     	return this.postalCode;
     }
+
+
 }

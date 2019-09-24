@@ -25,6 +25,7 @@ public class Person {
         for (int i = 1; i < phoneIDList.size(); i++) {
             System.out.print("\n\t\t\t  " + phoneIDList.get(i).toString());
         }
+        address.printAddress();
     }
 
     public String getName(){
