@@ -42,11 +42,6 @@ public class Main {
                 case "read":
                     System.out.println("In read.. Ongoing implementation");
                     readPersonObjectFromDB(personList);
-                    //For now: Read from personList
-                    //for (Person p : personList) {
-                    //    p.personToString();
-                        
-                    //}
                     break;
                 case "update":
                     System.out.println("In update");
@@ -54,7 +49,6 @@ public class Main {
                     break;
                 case "delete":
                     System.out.println("In delete");
-
                     break;
                 case "exit":
                     keepRunning = false;
