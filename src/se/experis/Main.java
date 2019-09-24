@@ -60,7 +60,33 @@ public class Main {
                     System.out.println("In read.. Ongoing implementation");
                     returnAbleSearch = readPersonObjectFromDB(db);
                     break;
-                case "1":
+                case "update":
+                    System.out.println("In update");
+                    //Person p3 = updatePersonToDatabase();
+                    break;
+                case "delete":
+                    System.out.println("In delete");
+                    break;
+                case "search":
+                    System.out.print("Search for name: ");
+                    input = in.nextLine();
+                    ArrayList<Person> p = db.dbSearch(input);
+                    for (Person per : p) {
+                        per.personToString();
+                        System.out.println("---- Phone ----");
+                        for(String phone : per.getPhoneIDList()){
+                            System.out.println(phone);
+                        }
+                        System.out.println("---- Email ----");
+                        for(String email : per.getEmailList()){
+                            System.out.println(email);
+                        }
+                        System.out.println("---- Address ----");
+                        per.getAddress().printAddress();
+
+                    }
+                    break;
+                case "exit":
                     keepRunning = false;
                     System.out.println("Exiting..");
                     break;
