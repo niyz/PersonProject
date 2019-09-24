@@ -16,27 +16,25 @@ public class Address {
     }
 
     public void printAddress() {
-        System.out.println("Country:" + country + "City:" + city + "Street:" + street +
-                "Street number:" + streetNum + "Postal code:" + postalCode);
+        System.out.println("\nCountry: " + country + "\nCity: " + city + "\nStreet: " + street +
+                "\nStreet number: " + streetNum + "\nPostal code: " + postalCode);
     }
 
     public String getCountry() {
-        return this.country;
+    	return this.country;
     }
-
     public String getCity() {
-        return this.city;
+    	return this.city;
     }
-
     public String getStreet() {
-        return this.street;
+    	return this.street;
     }
-
     public String getStreetNum() {
-        return this.streetNum;
+    	return this.streetNum;
+    }
+    public String getPostalCode() {
+    	return this.postalCode;
     }
 
-    public String getPostalCode() {
-        return this.postalCode;
-    }
+
 }
