@@ -21,22 +21,20 @@ public class Address {
     }
 
     public String getCountry() {
-        return this.country;
+    	return this.country;
     }
-
     public String getCity() {
-        return this.city;
+    	return this.city;
     }
-
     public String getStreet() {
-        return this.street;
+    	return this.street;
     }
-
     public String getStreetNum() {
-        return this.streetNum;
+    	return this.streetNum;
+    }
+    public String getPostalCode() {
+    	return this.postalCode;
     }
 
-    public String getPostalCode() {
-        return this.postalCode;
-    }
+
 }
