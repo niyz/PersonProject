@@ -7,22 +7,29 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        Boolean keepRunning = true;
+        boolean keepRunning = true;
         //Create instance of database
         DataBase db = new DataBase();
         //Create phoneList and populate it
         ArrayList<String> phoneNumbers_p1 = new ArrayList<String>();
         phoneNumbers_p1.add("0700000");
         phoneNumbers_p1.add("0700001");
+        ArrayList<String> phoneNumbers_p2 = new ArrayList<String>();
+        phoneNumbers_p2.add("0700022");
+        phoneNumbers_p2.add("0700023");
         //Create address for one person
         Address address_p1 = new Address("Sweden", "Kalmar", "Blackagatan", "32", "32322");
+        Address address_p2 = new Address("Denmark", "Whoknows", "Beerstreet", "91", "12333");
+
         //Create the person with its member variables including the address
         Person p1 = new Person("elliot", "123123", "bushkaka", phoneNumbers_p1, address_p1);
+        Person p2 = new Person("Jannik", "333333", "Densk", phoneNumbers_p2, address_p2);
 
         //Create the personList
         ArrayList<Person> personList = new ArrayList<Person>();
         //add person
         personList.add(p1);
+        personList.add(p2);
 
 
         String input;
@@ -58,7 +65,6 @@ public class Main {
                     System.out.println("Default");
                     break;
             }
-
         }
     }
 
