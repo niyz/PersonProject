@@ -20,44 +20,8 @@ public class databaseFunctions {
 		Person person = new Person("Sven","199012111337","Johansson",phoneNumbers,address);
 		
 		insertPerson(person);*/
-		selectPerson("SELECT * FROM person");
-		selectAdress("SELECT * FROM adress");
 		
 		
-	}
-	public static void selectAdress(String sql) {	
-		Connection conn = connect();
-		Statement stmt;
-		ResultSet rs = null;
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			
-			while (rs.next()) {
-                System.out.println(rs.getString("adressID")+" "+rs.getString("street")+" "+rs.getString("streetNum"));
-            }
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	public static void selectPerson(String sql) {	
-		Connection conn = connect();
-		Statement stmt;
-		ResultSet rs = null;
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			
-			while (rs.next()) {
-                System.out.println(rs.getString("id")+" "+rs.getString("personID")+" "+rs.getString("firstName"));
-            }
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	public static String selectAdressID(Connection conn, String sql) {
 		String info = "";	
