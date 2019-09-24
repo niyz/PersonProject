@@ -8,27 +8,53 @@ public class Main {
 
     public static void main(String[] args) {
         Boolean keepRunning = true;
+        //Create instance of database
+        DataBase db = new DataBase();
+        //Create phoneList and populate it
+        ArrayList<String> phoneNumbers_p1 = new ArrayList<String>();
+        phoneNumbers_p1.add("0700000");
+        phoneNumbers_p1.add("0700001");
+        //Create address for one person
+        Address address_p1 = new Address("Sweden", "Kalmar", "Blackagatan", "32", "32322");
+        //Create the person with its member variables including the address
+        Person p1 = new Person("elliot", "123123", "bushkaka", phoneNumbers_p1, address_p1);
+
+        //Create the personList
+        ArrayList<Person> personList = new ArrayList<Person>();
+        //add person
+        personList.add(p1);
+
 
         String input;
         while (keepRunning) {
-            System.out.println("Create, read, update or delete?\nExit to stop");
+            System.out.println("\nCreate, read, update or delete?\nExit to stop");
 
             Scanner in = new Scanner(System.in);
             input = in.nextLine().toLowerCase();
             switch (input) {
                 case "create":
                     System.out.println("In create");
-                    Person p1 = createPersonObject();
-                    p1.personToString();
+                    Person pNew = createPersonObject();
+                    //TODO: Insert to database when Elliot is done with the function
+                    //For now: Update personList
+                    personList.add(pNew);
                     break;
                 case "read":
-                    System.out.println("In read");
+                    System.out.println("In read.. Ongoing implementation");
+                    readPersonObjectFromDB(personList);
+                    //For now: Read from personList
+                    //for (Person p : personList) {
+                    //    p.personToString();
+                        
+                    //}
                     break;
                 case "update":
                     System.out.println("In update");
+                    //Person p3 = updatePersonToDatabase();
                     break;
                 case "delete":
                     System.out.println("In delete");
+
                     break;
                 case "exit":
                     keepRunning = false;
@@ -71,6 +97,47 @@ public class Main {
         Person p1 = new Person(firstName, personID, surName, phoneList, address);
 
         return p1;
+    }
+    private static void readPersonObjectFromDB(ArrayList<Person> personList){
+        Scanner in = new Scanner(System.in);
+        ArrayList<Person> listOfFoundPersons = new ArrayList<Person>();
+        String searchable;
+        System.out.println("Search query: ");
+        Person personToReturn;
+        searchable = in.nextLine();
+        //TODO: Anrop till db search funktion
+        for (Person per: personList) {
+            if (per.getPersonID().contains(searchable) || per.getLastName().contains(searchable)
+            || per.getName().contains(searchable) || per.getAddress().toString().contains(searchable)
+                    || per.getPhoneIDList().toString().contains(searchable))
+            {
+                System.out.println("SUCCESS");
+                listOfFoundPersons.add(per);
+            }else{
+                System.out.println("FAIL");
+            }
+        }
+        //Db.search-någonting.
+
+
+        for (Person p: listOfFoundPersons
+             ) {
+            p.personToString();
+
+        }
+
+    }
+    private static Person updatePersonToDatabase(){
+        Scanner in = new Scanner(System.in);
+        String searchable;
+        System.out.println("Search query: ");
+        searchable = in.nextLine();
+        //TODO: Anrop till db update funktion
+        //Db.update-någonting.
+        Person p3 = null;
+
+        return p3;
+
     }
 
 
