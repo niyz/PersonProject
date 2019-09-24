@@ -45,7 +45,7 @@ public class DataBase {
         ArrayList<Person> personList = new ArrayList<>();
         ArrayList<String> mailList = new ArrayList<>();
         ArrayList<String> phoneList = new ArrayList<>();
-        String searchPersonSql = "SELECT * FROM person WHERE firstname OR lastname LIKE ?";
+        String searchPersonSql = "SELECT * FROM person WHERE firstname LIKE ? OR lastname LIKE ?";
         String searchAddressSql= "SELECT * FROM adress WHERE adressid = ?";
         String searchPhoneSql = "SELECT * FROM phone WHERE personid = ?";
         String searchEmailSql = "SELECT * FROM email WHERE personid = ?";
@@ -57,6 +57,7 @@ public class DataBase {
             conn = this.dbConnect();
             PreparedStatement prePersonSearch = conn.prepareStatement(searchPersonSql, Statement.RETURN_GENERATED_KEYS);
             prePersonSearch.setString(1, "%" + searchStr + "%");
+            prePersonSearch.setString(2, "%" + searchStr + "%");
             ResultSet personResult = prePersonSearch.executeQuery();
             int personID = personResult.getInt("adressid");
 
