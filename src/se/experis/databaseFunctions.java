@@ -46,7 +46,7 @@ public class databaseFunctions {
 		selectAllId = selectAllId(conn,"SELECT id FROM email WHERE personID='"+ID+"'");
 		oldSize = selectAllId.size();
 		newSize = newPerson.getEmailList().size();
-		for(int i=0;i<newPerson.getPhoneIDList().size();i++) {
+		for(int i=0;i<newPerson.getEmailList().size();i++) {
 			executeInsertSQL(conn,"UPDATE phone SET email='"+newPerson.getEmailList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
 		}
 		for(int i=oldSize;i<newSize;i++) {
