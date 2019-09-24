@@ -41,7 +41,6 @@ public class Main {
 
         String input;
         while (keepRunning) {
-            System.out.println("\nAdd or search for person?\nExit to stop");
             System.out.println("Enter the digit for the corresponding choice: \n[1]: Exit\n[2]: Add\n[3]: Search");
 
 
@@ -59,8 +58,62 @@ public class Main {
                 case "3":
                     System.out.println("In read.. Ongoing implementation");
                     returnAbleSearch = readPersonObjectFromDB(db);
+                    if (returnAbleSearch != null)
+                    {
+                        System.out.println("Something returned");
+                        System.out.println("Enter the digit for the corresponding choice: \n[1]: Back\n[2]: Update\n[3]: Delete\n[4]: Add relation");
+                        String input2 = in.nextLine();
+                        if (input2.equals("1"))
+                        {
+                            System.out.println("1");
+                            System.out.println("BACK... should work");
+                        }else if (input2.equals("2")){
+                            System.out.println("2");
+                            System.out.println("Update...half implemented");
+                            updatePersonToDatabase(db, returnAbleSearch);
+
+
+                        }else if (input2.equals("3")){
+                            System.out.println("3");
+                            System.out.println("Delete... not implemented");
+
+
+                        }else if (input2.equals("4")){
+                            System.out.println("4");
+                            System.out.println("Add Relation.. not implemented");
+                        }
+
+                    }else{
+                        System.out.println("nothing returned");
+                    }
                     break;
-                case "1":
+                case "update":
+                    System.out.println("In update");
+                    //Person p3 = updatePersonToDatabase();
+                    break;
+                case "delete":
+                    System.out.println("In delete");
+                    break;
+                case "search":
+                    System.out.print("Search for name: ");
+                    input = in.nextLine();
+                    ArrayList<Person> p = db.dbSearch(input);
+                    for (Person per : p) {
+                        per.personToString();
+                        System.out.println("---- Phone ----");
+                        for(String phone : per.getPhoneIDList()){
+                            System.out.println(phone);
+                        }
+                        System.out.println("---- Email ----");
+                        for(String email : per.getEmailList()){
+                            System.out.println(email);
+                        }
+                        System.out.println("---- Address ----");
+                        per.getAddress().printAddress();
+
+                    }
+                    break;
+                case "exit":
                     keepRunning = false;
                     System.out.println("Exiting..");
                     break;
@@ -126,11 +179,10 @@ public class Main {
                 System.out.println("Enter search string: \n");
                 searchable = in.nextLine();
                 listOfFoundPersons = db.dbSearch(searchable);
-                System.out.println(listOfFoundPersons.size());
                 if (listOfFoundPersons.size() > 0){
 
                     for (int i = 0; i < listOfFoundPersons.size(); i++) {
-                        System.out.println(i + " : ");
+                        System.out.print("["+ i + "]: ");
                         listOfFoundPersons.get(i).personToString();
                     }
                     System.out.println("Enter the preceding digit to choose person");
@@ -138,6 +190,7 @@ public class Main {
                     chosenPerson = Integer.parseInt(choosePerson);
                     returnable = listOfFoundPersons.get(chosenPerson);
                 }else{
+
                     System.out.println("No hit..");
                 }
                 run = false;
@@ -148,16 +201,19 @@ public class Main {
         return returnable;
 
     }
-    private static Person updatePersonToDatabase(){
-        Scanner in = new Scanner(System.in);
-        String searchable;
-        System.out.println("Search query: ");
-        searchable = in.nextLine();
-        //TODO: Anrop till db update funktion
-        //Db.update-någonting.
-        Person p3 = null;
+    private static void updatePersonToDatabase(DataBase db, Person personOrg){
 
-        return p3;
+        Person personNew = new Person(personOrg.getName(), personOrg.getPersonID(),
+                "johansson", personOrg.getPhoneIDList(),
+                personOrg.getEmailList(), personOrg.getAddress());
+
+
+        //Temporary fix
+        System.out.println("New: " + personNew.getLastName() +"\nOld: " + personOrg.getLastName());
+        databaseFunctions.updatePerson(personOrg, personNew);
+
+        //TODO: db.updatePerson(personOrg, personNew);
+
 
     }
 

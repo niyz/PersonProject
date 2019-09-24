@@ -16,8 +16,93 @@ public class databaseFunctions {
 		
 		
 	}
+
+	public static void updatePerson(Person oldPerson, Person newPerson) {
+		Connection conn = connect();
+		
+		int addressID = getAddressIdOrAdd(conn,newPerson.getAddress());
+		
+		String selectPersonSQL = "SELECT id FROM person WHERE personID='"+oldPerson.getPersonID()+"'";
+		
+		String ID = selectAnID(conn,selectPersonSQL);
+		
+		String executeUpdateString = "UPDATE person SET personID='"+newPerson.getPersonID()+"' firstName='"+newPerson.getName()
+		+"' lastName='"+newPerson.getLastName()+"' addressID='"+addressID+"' WHERE id='"+ID+"'";
+		
+		executeInsertSQL(conn,executeUpdateString);
+		
+		
+		ArrayList<String> selectAllId = selectAllId(conn,"SELECT id FROM phone WHERE personID='"+ID+"'");
+		int oldSize = selectAllId.size();
+		int newSize = newPerson.getPhoneIDList().size();
+		for(int i=0;i<newPerson.getPhoneIDList().size();i++) {
+			executeInsertSQL(conn,"UPDATE phone SET phone='"+newPerson.getPhoneIDList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
+		}
+		for(int i=oldSize;i<newSize;i++) {
+			executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+newPerson.getPhoneIDList()+"')");
+		}
+		
+		
+		selectAllId = selectAllId(conn,"SELECT id FROM email WHERE personID='"+ID+"'");
+		oldSize = selectAllId.size();
+		newSize = newPerson.getEmailList().size();
+		for(int i=0;i<newPerson.getEmailList().size();i++) {
+			executeInsertSQL(conn,"UPDATE phone SET email='"+newPerson.getEmailList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
+		}
+		for(int i=oldSize;i<newSize;i++) {
+			executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+newPerson.getEmailList()+"','"+ID+"')");
+		}
+		
+	}
+	public static void insertPerson(Person person) {
+		
+		Connection conn = connect();
+		
+		int adressID = getAddressIdOrAdd(conn,person.getAddress());
+		
+		String personInfo = "INSERT INTO person(personID,firstName,lastName,adressID) "
+				+ "VALUES('"+person.getPersonID()+"','"+person.getName()+"','"+person.getLastName()+"','"+adressID+"')";
+		
+		executeInsertSQL(conn,personInfo);
+		
+		String getIDString = "SELECT id FROM person WHERE personID='"+person.getPersonID()+"'";
+		
+		String ID = selectAnID(conn,getIDString);
+		
+		for(String num:person.getPhoneIDList()) {
+			executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+num+"')");
+		}
+		
+		for(String email:person.getEmailList()) {
+			executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+email+"','"+ID+"')");
+		}
+	}
+	
+	
+	private static ArrayList<String> selectAllId(Connection conn, String sql) {
+		ArrayList<String> ids = new ArrayList<String>();	
+		//Connection conn = connect();
+		Statement stmt;
+		ResultSet rs = null;
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			//info=rs.getString("adressID");
+			while (rs.next()) {
+                ids.add(rs.getString("adressID"));
+            }
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	        
+		return ids;
+	}
 	private static String selectAdressID(Connection conn, String sql) {
 		String info = "";
+
 		//Connection conn = connect();
 		Statement stmt;
 		ResultSet rs = null;
@@ -58,29 +143,7 @@ public class databaseFunctions {
 
 		return info;
 	}
-	public static void insertPerson(Person person) {
 
-		Connection conn = connect();
-
-		int adressID = getAddressIdOrAdd(conn,person.getAddress());
-
-		String personInfo = "INSERT INTO person(personID,firstName,lastName,adressID) "
-				+ "VALUES('"+person.getPersonID()+"','"+person.getName()+"','"+person.getLastName()+"','"+adressID+"')";
-
-		executeInsertSQL(conn,personInfo);
-
-		String getIDString = "SELECT id FROM person WHERE personID='"+person.getPersonID()+"'";
-
-		String ID = selectAnID(conn,getIDString);
-
-		for(String num:person.getPhoneIDList()) {
-			executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+num+"')");
-		}
-
-		for(String email:person.getEmailList()) {
-			executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+email+"','"+ID+"')");
-		}
-	}
 	private static int getAddressIdOrAdd(Connection conn, Address address) {
 
 		String getAddressIdString = "SELECT adressID FROM adress WHERE country='"+address.getCountry()+
