@@ -10,8 +10,6 @@ public class Person {
     private ArrayList<String> emailList;
     private Address address;
 
-    //TODO: Add address and its constructor
-
     Person(String name, String personID, String lastName, ArrayList<String> phoneIDList, ArrayList<String> emailList, Address address){
         this.name = name;
         this.personID = personID;
