@@ -11,32 +11,6 @@ public class Main {
         boolean keepRunning = true;
         //Create instance of database
         DataBase db = new DataBase();
-        //Create phoneList and populate it
-        /*ArrayList<String> phoneNumbers_p1 = new ArrayList<String>();
-        phoneNumbers_p1.add("0700000");
-        phoneNumbers_p1.add("0700001");
-        ArrayList<String> phoneNumbers_p2 = new ArrayList<String>();
-        phoneNumbers_p2.add("0700022");
-        phoneNumbers_p2.add("0700023");
-        ArrayList<String> emailList_p1 = new ArrayList<String>();
-        ArrayList<String> emailList_p2 = new ArrayList<String>();
-        emailList_p1.add("somemail@some.com");
-        emailList_p2.add("anothermail@different.com");
-        //Create address for one person
-        Address address_p1 = new Address("Sweden", "Kalmar", "Blackagatan", "32", "32322");
-        Address address_p2 = new Address("Denmark", "Whoknows", "Beerstreet", "91", "12333");
-
-        //Create the person with its member variables including the address
-        Person p1 = new Person("elliot", "123123", "bushkaka", phoneNumbers_p1,emailList_p1, address_p1);
-        Person p2 = new Person("Jannik", "333333", "Densk", phoneNumbers_p2,emailList_p2, address_p2);
-
-        //Create the personList
-        ArrayList<Person> personList = new ArrayList<Person>();
-        //add person
-        personList.add(p1);
-        db.insertPerson(p1);
-        personList.add(p2);
-        db.insertPerson(p2);*/
         Person returnAbleSearch;
 
         String input;
@@ -50,7 +24,6 @@ public class Main {
                 case "2":
                     System.out.println("In create");
                     Person pNew = createPersonObject();
-                    //TODO: Insert to database when Elliot is done with the function
                     //For now: Update personList
                     //personList.add(pNew);
                     db.insertPerson(pNew);
@@ -100,16 +73,17 @@ public class Main {
                     ArrayList<Person> p = db.dbSearch(input);
                     for (Person per : p) {
                         per.personToString();
-                        System.out.println("---- Phone ----");
+                        //System.out.println("---- Phone ----");
                         for(String phone : per.getPhoneIDList()){
-                            System.out.println(phone);
+                            //System.out.println(phone);
                         }
                         System.out.println("---- Email ----");
                         for(String email : per.getEmailList()){
                             System.out.println(email);
                         }
-                        System.out.println("---- Address ----");
-                        per.getAddress().printAddress();
+                        //System.out.println("---- Address ----");
+                        //per.getAddress().printAddress();
+                        System.out.println("---- next ---");
 
                     }
                     break;
@@ -207,16 +181,11 @@ public class Main {
                 "johansson", personOrg.getPhoneIDList(),
                 personOrg.getEmailList(), personOrg.getAddress());
 
-
         //Temporary fix
         System.out.println("New: " + personNew.getLastName() +"\nOld: " + personOrg.getLastName());
         databaseFunctions.updatePerson(personOrg, personNew);
 
         //TODO: db.updatePerson(personOrg, personNew);
-
-
     }
-
-
 }
 
