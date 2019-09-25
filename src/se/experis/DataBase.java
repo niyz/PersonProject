@@ -15,15 +15,6 @@ public class DataBase {
             conn = DriverManager.getConnection(dbUrl);
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try{
-                if(conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e){
-                System.out.println("Error: db search faild to close connection");
-                System.out.println(e.getMessage());
-            }
         }
         return conn;
     }
