@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class databaseFunctions {
 
 	public static void main(String[] args) {
-		
+		/*
 		ArrayList<String> email = new ArrayList<String>();
 		email.add("Sven420@hotmail.com");
 		email.add("svenNyMail@hotmail.com");
@@ -23,11 +23,29 @@ public class databaseFunctions {
 		Person newPerson = new Person("Sven","199909098888","Urbansson",phoneNums,email,adress);
 		
 		
-		updatePerson(oldPerson,newPerson);
-		
+		//updatePerson(oldPerson,newPerson);
+		addRelation(oldPerson,newPerson,1);
+		*/
 		
 	}
-
+	public static void addRelation(Person p1, Person p2, int typeOfRelation) {
+		Connection conn = connect();
+		String id1 = selectAnID(conn,"SELECT id FROM person WHERE personID='"+p1.getPersonID()+"'");
+		String id2 = selectAnID(conn,"SELECT id FROM person WHERE personID='"+p2.getPersonID()+"'");
+		
+		
+		String addRelation = "INSERT INTO relationship(person1,person2,relation) VALUES('"+id1+"','"+id2+"','"+typeOfRelation+"')";
+		
+		executeInsertSQL(conn,addRelation);
+	}
+	public static void deleteRelations(Person person) {
+		Connection conn = connect();
+		String id = selectAnID(conn,"SELECT id FROM person WHERE personID='"+person.getPersonID()+"'");
+		String deleteRelation = "DELETE FROM relationship WHERE person1='"+id+"' OR person2='"+id+"'";
+		executeInsertSQL(conn,deleteRelation);
+	}
+	
+	
 	public static void updatePerson(Person oldPerson, Person newPerson) {
 		Connection conn = connect();
 		
@@ -56,7 +74,7 @@ public class databaseFunctions {
 		}
 		
 		for(int i=oldSize;i<newSize;i++) {
-			executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+newPerson.getPhoneIDList()+"')");
+			executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+newPerson.getPhoneIDList().get(i)+"')");
 		}
 		
 		
@@ -67,7 +85,7 @@ public class databaseFunctions {
 			executeInsertSQL(conn,"UPDATE email SET email='"+newPerson.getEmailList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
 		}
 		for(int i=oldSize;i<newSize;i++) {
-			executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+newPerson.getEmailList()+"','"+ID+"')");
+			executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+newPerson.getEmailList().get(i)+"','"+ID+"')");
 		}
 		
 	}
