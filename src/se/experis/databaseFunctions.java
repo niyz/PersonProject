@@ -11,8 +11,19 @@ public class databaseFunctions {
 
 	public static void main(String[] args) {
 		
+		ArrayList<String> email = new ArrayList<String>();
+		email.add("Sven420@hotmail.com");
+		email.add("svenNyMail@hotmail.com");
+		ArrayList<String> phoneNums = new ArrayList<String>();
+		phoneNums.add("0742222222");
+		phoneNums.add("0742222233");
+		Address adress = new Address("Israel","Los Angeles","Storgatan","420","12345");
+		
+		Person oldPerson = new Person("Sven","199013111337","Urbansson",phoneNums,email,adress);
+		Person newPerson = new Person("Sven","199909098888","Urbansson",phoneNums,email,adress);
 		
 		
+		updatePerson(oldPerson,newPerson);
 		
 		
 	}
@@ -26,18 +37,24 @@ public class databaseFunctions {
 		
 		String ID = selectAnID(conn,selectPersonSQL);
 		
-		String executeUpdateString = "UPDATE person SET personID='"+newPerson.getPersonID()+"' firstName='"+newPerson.getName()
-		+"' lastName='"+newPerson.getLastName()+"' addressID='"+addressID+"' WHERE id='"+ID+"'";
+		String executeUpdateString = "UPDATE person SET personID='"+newPerson.getPersonID()+"', firstName='"+newPerson.getName()
+		+"', lastName='"+newPerson.getLastName()+"', adressID='"+addressID+"' WHERE id='"+ID+"'";
+		
+		
+		System.out.println(executeUpdateString);
 		
 		executeInsertSQL(conn,executeUpdateString);
 		
 		
 		ArrayList<String> selectAllId = selectAllId(conn,"SELECT id FROM phone WHERE personID='"+ID+"'");
+		
+		
 		int oldSize = selectAllId.size();
 		int newSize = newPerson.getPhoneIDList().size();
-		for(int i=0;i<newPerson.getPhoneIDList().size();i++) {
+		for(int i=0;i<oldSize;i++) {
 			executeInsertSQL(conn,"UPDATE phone SET phone='"+newPerson.getPhoneIDList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
 		}
+		
 		for(int i=oldSize;i<newSize;i++) {
 			executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+newPerson.getPhoneIDList()+"')");
 		}
@@ -46,8 +63,8 @@ public class databaseFunctions {
 		selectAllId = selectAllId(conn,"SELECT id FROM email WHERE personID='"+ID+"'");
 		oldSize = selectAllId.size();
 		newSize = newPerson.getEmailList().size();
-		for(int i=0;i<newPerson.getEmailList().size();i++) {
-			executeInsertSQL(conn,"UPDATE phone SET email='"+newPerson.getEmailList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
+		for(int i=0;i<oldSize;i++) {
+			executeInsertSQL(conn,"UPDATE email SET email='"+newPerson.getEmailList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
 		}
 		for(int i=oldSize;i<newSize;i++) {
 			executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+newPerson.getEmailList()+"','"+ID+"')");
@@ -90,7 +107,7 @@ public class databaseFunctions {
 			
 			//info=rs.getString("adressID");
 			while (rs.next()) {
-                ids.add(rs.getString("adressID"));
+                ids.add(rs.getString("id"));
             }
 			
 		} catch (SQLException e) {
@@ -131,10 +148,10 @@ public class databaseFunctions {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
 
-			info=rs.getString("id");
-			/*while (rs.next()) {
+			//info=rs.getString("id");
+			while (rs.next()) {
                 info=rs.getString("id");
-            }*/
+            }
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

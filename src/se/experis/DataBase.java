@@ -42,7 +42,7 @@ public class DataBase {
     }
 
     public ArrayList<Person> dbSearch(String searchStr){ // search for phone number or email address dont work...
-        ArrayList<Person> personList = new ArrayList<>();
+        /*ArrayList<Person> personList = new ArrayList<>();
         ArrayList<String> mailList = new ArrayList<>();
         ArrayList<String> phoneList = new ArrayList<>();
         String searchPersonSql = "SELECT * FROM person WHERE firstname LIKE ? OR lastname LIKE ?";
@@ -109,7 +109,214 @@ public class DataBase {
             System.out.println(e.getMessage());
         }
 
+        return personList;*/
+        ArrayList<Person> pList = new ArrayList<>();
+        if(this.isInt(searchStr)){
+            pList =this.dbPhonePersonSearch(searchStr);
+        } else {
+            pList= this.dbPersonSearch(searchStr);
+        }
+        return pList;
+    }
+    private ArrayList<Person> dbPersonSearch(String searchStr){
+        ArrayList<Person> personList = new ArrayList<>();
+        ArrayList<String> mailList = new ArrayList<>();
+        ArrayList<String> phoneList = new ArrayList<>();
+        String searchPersonSql = "SELECT * FROM person WHERE firstname LIKE ? OR lastname LIKE ?";
+        String searchAddressSql= "SELECT * FROM adress WHERE adressid = ?";
+        String searchPhoneSql = "SELECT * FROM phone WHERE personid = ?";
+        String searchEmailSql = "SELECT * FROM email WHERE personid = ?";
+        String searhcRelSql = "SELECT * FROM relationship WHERE person1 = ? OR person2 = ?";
+        Connection conn = null;
+        Person pObj;
+        Address addr = null;
+
+        try {
+            conn = this.dbConnect();
+            PreparedStatement prePersonSearch = conn.prepareStatement(searchPersonSql, Statement.RETURN_GENERATED_KEYS);
+            prePersonSearch.setString(1, "%" + searchStr + "%");
+            prePersonSearch.setString(2, "%" + searchStr + "%");
+            ResultSet personResult = prePersonSearch.executeQuery();
+            /*while(personResult.next()){
+                System.out.println("result: " + personResult.getInt("id"));
+            }
+            int personID = personResult.getInt("adressid");
+            /*ResultSet rs = customerPs.getGeneratedKeys();
+            while(rs.next()){
+                System.out.println("Result Set: " + rs.toString());
+                customerID = rs.getInt(1);
+            }*/
+
+            /*PreparedStatement preAddrSearch = conn.prepareStatement(searchAddressSql, Statement.RETURN_GENERATED_KEYS);
+            preAddrSearch.setInt(1, personResult.getInt("adressid"));
+            ResultSet addrResult = preAddrSearch.executeQuery();
+            while(addrResult.next()){ // add address to address object that then is beeing put into person object..
+                addr = new Address(
+                        addrResult.getString("country"),
+                        addrResult.getString("city"),
+                        addrResult.getString("street"),
+                        addrResult.getString("streetNum"),
+                        addrResult.getString("postalcode")
+                );
+            }
+
+            PreparedStatement prePhoneSearch = conn.prepareStatement(searchPhoneSql);
+            prePhoneSearch.setInt(1, personID);
+            ResultSet phoneResult = prePhoneSearch.executeQuery();
+            while(phoneResult.next()){
+                phoneList.add(phoneResult.getString("phone"));
+            }
+
+            PreparedStatement preEmailSearch = conn.prepareStatement(searchEmailSql);
+            preEmailSearch.setInt(1, personID);
+            ResultSet emailResult = preEmailSearch.executeQuery();
+
+            while(emailResult.next()){
+                mailList.add(emailResult.getString("email"));
+            }*/
+
+            while(personResult.next()){
+
+                PreparedStatement preAddrSearch = conn.prepareStatement(searchAddressSql, Statement.RETURN_GENERATED_KEYS);
+                preAddrSearch.setInt(1, personResult.getInt("adressid"));
+                ResultSet addrResult = preAddrSearch.executeQuery();
+                while(addrResult.next()){ // add address to address object that then is beeing put into person object..
+                    addr = new Address(
+                            addrResult.getString("country"),
+                            addrResult.getString("city"),
+                            addrResult.getString("street"),
+                            addrResult.getString("streetNum"),
+                            addrResult.getString("postalcode")
+                    );
+                }
+
+                PreparedStatement prePhoneSearch = conn.prepareStatement(searchPhoneSql);
+                prePhoneSearch.setInt(1, personResult.getInt("id"));
+                ResultSet phoneResult = prePhoneSearch.executeQuery();
+                while(phoneResult.next()){
+                    phoneList.add(phoneResult.getString("phone"));
+                }
+
+                PreparedStatement preEmailSearch = conn.prepareStatement(searchEmailSql);
+                preEmailSearch.setInt(1, personResult.getInt("id"));
+                ResultSet emailResult = preEmailSearch.executeQuery();
+
+                while(emailResult.next()){
+                    mailList.add(emailResult.getString("email"));
+                }
+
+
+                pObj = new Person(
+                        personResult.getString("firstname"),
+                        personResult.getString("personid"),
+                        personResult.getString("lastname"),
+                        phoneList,
+                        mailList,
+                        addr
+                );
+                personList.add(pObj);
+
+
+            }
+
+
+        } catch (SQLException e){
+            System.out.println("Error: SQL Exception");
+            System.out.println(e.getMessage());
+        }
+
         return personList;
+    }
+
+    private ArrayList<Person> dbPhonePersonSearch(String searchStr){
+        ArrayList<Person> personList = new ArrayList<>();
+        ArrayList<String> mailList = new ArrayList<>();
+        ArrayList<String> phoneList = new ArrayList<>();
+        String searchPersonSql = "SELECT * FROM person WHERE id = ?";
+        String searchAddressSql= "SELECT * FROM adress WHERE adressid = ?";
+        String searchPhoneSql = "SELECT * FROM phone WHERE phone LIKE ?";
+        String searchEmailSql = "SELECT * FROM email WHERE personid = ?";
+        String searhcRelSql = "SELECT * FROM relationship WHERE person1 = ? OR person2 = ?";
+        Connection conn = null;
+        Person pObj;
+        Address addr = null;
+        try {
+            conn = this.dbConnect();
+
+            PreparedStatement prePhoneSearch = conn.prepareStatement(searchPhoneSql);
+            prePhoneSearch.setString(1, "%" + searchStr + "%");
+            ResultSet phoneResult = prePhoneSearch.executeQuery();
+            System.out.println(phoneResult.getString("phone"));
+            while(phoneResult.next()){
+                phoneList.add(phoneResult.getString("phone"));
+                //System.out.println(phoneResult.getString("phone"));
+            }
+
+
+            /*PreparedStatement prePersonSearch = conn.prepareStatement(searchPersonSql, Statement.RETURN_GENERATED_KEYS);
+            prePersonSearch.setString(1, "%" + searchStr + "%");
+            prePersonSearch.setString(2, "%" + searchStr + "%");
+            ResultSet personResult = prePersonSearch.executeQuery();
+            int personID = personResult.getInt("adressid");
+
+            PreparedStatement preAddrSearch = conn.prepareStatement(searchAddressSql, Statement.RETURN_GENERATED_KEYS);
+            preAddrSearch.setInt(1, personID);
+            ResultSet addrResult = preAddrSearch.executeQuery();
+            while(addrResult.next()){ // add address to address object that then is beeing put into person object..
+                addr = new Address(
+                        addrResult.getString("country"),
+                        addrResult.getString("city"),
+                        addrResult.getString("street"),
+                        addrResult.getString("streetNum"),
+                        addrResult.getString("postalcode")
+                );
+            }
+
+
+
+            PreparedStatement preEmailSearch = conn.prepareStatement(searchEmailSql);
+            preEmailSearch.setInt(1, personID);
+            ResultSet emailResult = preEmailSearch.executeQuery();
+
+            while(emailResult.next()){
+                mailList.add(emailResult.getString("email"));
+            }
+
+            while(personResult.next()){
+                pObj = new Person(
+                        personResult.getString("firstname"),
+                        personResult.getString("personid"),
+                        personResult.getString("lastname"),
+                        phoneList,
+                        mailList,
+                        addr
+                );
+
+                personList.add(pObj);
+
+            }*/
+
+
+        } catch (SQLException e){
+            System.out.println("Error: SQL Exception");
+            System.out.println(e.getMessage());
+        }
+
+        return personList;
+    }
+
+
+    /**
+     * dbSearch help method
+     */
+    private boolean isInt(String str){
+        try{
+            Integer.parseInt(str);
+        } catch (NumberFormatException e){
+            System.out.println("String is not an int. ");
+            return false;
+        }
+        return true;
     }
 
 
