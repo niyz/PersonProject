@@ -24,7 +24,6 @@ public class Main {
                 case "2":
                     System.out.println("In create");
                     Person pNew = createPersonObject();
-                    //TODO: Insert to database when Elliot is done with the function
                     //For now: Update personList
                     //personList.add(pNew);
                     db.insertPerson(pNew);
