@@ -73,16 +73,17 @@ public class Main {
                     ArrayList<Person> p = db.dbSearch(input);
                     for (Person per : p) {
                         per.personToString();
-                        System.out.println("---- Phone ----");
+                        //System.out.println("---- Phone ----");
                         for(String phone : per.getPhoneIDList()){
-                            System.out.println(phone);
+                            //System.out.println(phone);
                         }
                         System.out.println("---- Email ----");
                         for(String email : per.getEmailList()){
                             System.out.println(email);
                         }
-                        System.out.println("---- Address ----");
-                        per.getAddress().printAddress();
+                        //System.out.println("---- Address ----");
+                        //per.getAddress().printAddress();
+                        System.out.println("---- next ---");
 
                     }
                     break;
