@@ -97,6 +97,7 @@ public class DatabaseFunctionsDelete {
         }
 
     }
+
     public static void insertPerson(Person person) {
 
         Connection conn = connect();
@@ -142,6 +143,7 @@ public class DatabaseFunctionsDelete {
 
         return ids;
     }
+
     private static String selectAdressID(Connection conn, String sql) {
         String info = "";
 
@@ -164,6 +166,7 @@ public class DatabaseFunctionsDelete {
 
         return info;
     }
+
     private static String selectAnID(Connection conn, String sql) {
         String info = "";
         //Connection conn = connect();
@@ -203,6 +206,7 @@ public class DatabaseFunctionsDelete {
         int result = Integer.parseInt(addressID);
         return result;
     }
+
     private static void executeInsertSQL(Connection conn, String sql) {
         //Connection conn = connect();
         boolean autoCommit = false;

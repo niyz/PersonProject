@@ -19,14 +19,6 @@ public class DataBase {
         return conn;
     }
 
-    public boolean dbDelete(Person pObj){
-
-        return false;
-    }
-
-    public void dbUpdate(Person pObj){
-
-    }
 
     /**
      * 1 = dad
@@ -36,11 +28,6 @@ public class DataBase {
      * 5 = brother
      * 6 = sister
      */
-
-    public void addRelation(Person pObj, String otherPnummer, int relation){
-
-    }
-
 
 
     public ArrayList<Person> dbSearch(String searchStr){
@@ -232,38 +219,162 @@ public class DataBase {
 
 
     /**
-     * Elliot shit
+     * Elliot
      */
-    public void insertPerson(Person person) throws SQLException{
+    public void insertPerson(Person person){
 
-        Connection conn = this.dbConnect();
+        Connection conn = null;
 
-        int adressID = getAddressIdOrAdd(conn,person.getAddress());
 
-        String personInfo = "INSERT INTO person(personID,firstName,lastName,adressID) "
-                + "VALUES('"+person.getPersonID()+"','"+person.getName()+"','"+person.getLastName()+"','"+adressID+"')";
+        try {
+            conn = dbConnect();
+            conn.setAutoCommit(false);
+            int adressID = getAddressIdOrAdd(conn,person.getAddress());
+            String personInfo = "INSERT INTO person(personID,firstName,lastName,adressID) "
+                    + "VALUES('"+person.getPersonID()+"','"+person.getName()+"','"+person.getLastName()+"','"+adressID+"')";
+            executeInsertSQL(conn, personInfo);
 
-        executeInsertSQL(conn,personInfo);
+            String getIDString = "SELECT id FROM person WHERE personID='" + person.getPersonID() + "'";
 
-        String getIDString = "SELECT id FROM person WHERE personID='"+person.getPersonID()+"'";
+            String ID = selectAnID(conn, getIDString);
 
-        String ID = selectAnID(conn,getIDString);
+            for (String email : person.getEmailList()) {
+                executeInsertSQL(conn, "INSERT INTO email(email,personID) VALUES('" + email + "','" + ID + "')");
+            }
+            for (String num : person.getPhoneIDList()) {
+                executeInsertSQL(conn, "INSERT INTO phone(personID,phone) VALUES('" + ID + "','" + num + "')");
+            }
 
-        for(String num:person.getPhoneIDList()) {
-            executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+num+"')");
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void addRelation(Person p1, Person p2, int typeOfRelation) throws SQLException{
+        Connection conn = dbConnect();
+        String id1 = selectAnID(conn,"SELECT id FROM person WHERE personID='"+p1.getPersonID()+"'");
+        String id2 = selectAnID(conn,"SELECT id FROM person WHERE personID='"+p2.getPersonID()+"'");
+
+
+        String addRelation = "INSERT INTO relationship(person1,person2,relation) VALUES('"+id1+"','"+id2+"','"+typeOfRelation+"')";
+
+        executeInsertSQL(conn,addRelation);
+    }
+
+    public void deleteRelations(Person person) throws SQLException{
+        Connection conn = dbConnect();
+        String id = selectAnID(conn,"SELECT id FROM person WHERE personID='"+person.getPersonID()+"'");
+        String deleteRelation = "DELETE FROM relationship WHERE person1='"+id+"' OR person2='"+id+"'";
+        executeInsertSQL(conn,deleteRelation);
+        conn.close();
+    }
+
+    public void updatePerson(Person oldPerson, Person newPerson){
+        Connection conn = null;
+
+        try {
+            conn = dbConnect();
+            conn.setAutoCommit(false);
+            int addressID = getAddressIdOrAdd(conn,newPerson.getAddress());
+
+            String selectPersonSQL = "SELECT id FROM person WHERE personID='"+oldPerson.getPersonID()+"'";
+
+            String ID = selectAnID(conn,selectPersonSQL);
+
+            String executeUpdateString = "UPDATE person SET personID='"+newPerson.getPersonID()+"', firstName='"+newPerson.getName()
+                    +"', lastName='"+newPerson.getLastName()+"', adressID='"+addressID+"' WHERE id='"+ID+"'";
+
+
+            System.out.println(executeUpdateString);
+
+            executeInsertSQL(conn,executeUpdateString);
+
+
+            ArrayList<String> selectAllId = selectAllId(conn,"SELECT id FROM phone WHERE personID='"+ID+"'");
+
+
+            int oldSize = selectAllId.size();
+            int newSize = newPerson.getPhoneIDList().size();
+            for(int i=0;i<oldSize;i++) {
+                executeInsertSQL(conn,"UPDATE phone SET phone='"+newPerson.getPhoneIDList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
+            }
+
+            for(int i=oldSize;i<newSize;i++) {
+                executeInsertSQL(conn,"INSERT INTO phone(personID,phone) VALUES('"+ID+"','"+newPerson.getPhoneIDList().get(i)+"')");
+            }
+
+
+            selectAllId = selectAllId(conn,"SELECT id FROM email WHERE personID='"+ID+"'");
+            oldSize = selectAllId.size();
+            newSize = newPerson.getEmailList().size();
+            for(int i=0;i<oldSize;i++) {
+                executeInsertSQL(conn,"UPDATE email SET email='"+newPerson.getEmailList().get(i)+"' WHERE id='"+selectAllId.get(i)+"'");
+            }
+            for(int i=oldSize;i<newSize;i++) {
+                executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+newPerson.getEmailList().get(i)+"','"+ID+"')");
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
-        for(String email:person.getEmailList()) {
-            executeInsertSQL(conn,"INSERT INTO email(email,personID) VALUES('"+email+"','"+ID+"')");
-        }
     }
 
     /**
      * Help methods to insertPerson
      */
 
+    private static ArrayList<String> selectAllId(Connection conn, String sql) {
+        ArrayList<String> ids = new ArrayList<String>();
+        //Connection conn = connect();
+        Statement stmt;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            //info=rs.getString("adressID");
+            while (rs.next()) {
+                ids.add(rs.getString("id"));
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+
+        return ids;
+    }
+
     private static String selectAdressID(Connection conn, String sql) {
         String info = "";
+
         //Connection conn = connect();
         Statement stmt;
         ResultSet rs = null;
@@ -277,14 +388,14 @@ public class DataBase {
             }
 
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
 
         return info;
     }
 
-    private static String selectAnID(Connection conn, String sql) {
+    private String selectAnID(Connection conn, String sql) {
         String info = "";
         //Connection conn = connect();
         Statement stmt;
@@ -293,20 +404,20 @@ public class DataBase {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
 
-            info=rs.getString("id");
-			/*while (rs.next()) {
+            //info=rs.getString("id");
+            while (rs.next()) {
                 info=rs.getString("id");
-            }*/
+            }
 
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
 
         return info;
     }
 
-    private static int getAddressIdOrAdd(Connection conn, Address address) {
+    private static int getAddressIdOrAdd(Connection conn, Address address) throws SQLException{
 
         String getAddressIdString = "SELECT adressID FROM adress WHERE country='"+address.getCountry()+
                 "' AND city='"+address.getCity()+"' AND street='"+address.getStreet()+
@@ -317,6 +428,7 @@ public class DataBase {
             String insertAddress = "INSERT INTO adress(country,city,street,streetNum,postalCode) VALUES('"+
                     address.getCountry()+"','"+address.getCity()+"','"+address.getStreet()+"','"+address.getStreetNum()+"','"+
                     address.getPostalCode()+"')";
+
             executeInsertSQL(conn,insertAddress);
             addressID = selectAdressID(conn,getAddressIdString);
         }
@@ -324,31 +436,125 @@ public class DataBase {
         return result;
     }
 
-    private static void executeInsertSQL(Connection conn, String sql) {
+    private static void executeInsertSQL(Connection conn, String sql) throws SQLException {
         //Connection conn = connect();
         boolean autoCommit = false;
+        autoCommit = conn.getAutoCommit();
+            //System.out.println("autocommit: " + autoCommit);
+        conn.setAutoCommit(false);
+        Statement pstmt = conn.createStatement();
+        pstmt.executeUpdate(sql);
+        //conn.commit();
+
+        /*boolean autoCommit = false;
         try{
             autoCommit = conn.getAutoCommit();
+            //System.out.println("autocommit: " + autoCommit);
             conn.setAutoCommit(false);
             Statement pstmt = conn.createStatement();
             pstmt.executeUpdate(sql);
+            conn.commit();
         }
         catch (SQLException e) {
             try {
+                System.out.println("rolling back");
                 conn.rollback();
             } catch (SQLException e1) {
-                // TODO Auto-generated catch block
+                System.out.println("rollback error: " + e.getMessage());
                 e1.printStackTrace();
             }
+            System.out.println("sqlerror: " +  e.getMessage());
             e.printStackTrace();
         }
         finally {
             try {
                 conn.setAutoCommit(autoCommit);
             } catch (SQLException e) {
-                // TODO Auto-generated catch block
+
                 e.printStackTrace();
             }
-        }
+        }*/
     }
+
+    /**
+     * simon
+     */
+
+    public void deletePerson(Person person) /*throws SQLException*/{
+        try {
+            deleteRelations(person);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Connection conn = null;
+
+        try {
+            conn = dbConnect();
+            String selectPersonSQL = "SELECT id FROM person WHERE personID='"+person.getPersonID()+"'";
+            //String selectPersonSQL = "SELECT id FROM person WHERE personID=197702136543";
+            //System.out.println(selectPersonSQL);
+            String ID = selectAnID(conn,selectPersonSQL);
+            //System.out.println("id: " + ID);
+            //System.out.println("PHONE: ");
+            String sqlStatementPhone = "DELETE FROM phone WHERE personID='"+ID+"'";
+            //selectAllId(conn,sqlStatement);
+            //System.out.println("MAIL: ");
+
+            String sqlStatementMail = "DELETE FROM email WHERE personID='"+ID+"'";
+            String sqlStatementPerson = "DELETE FROM person WHERE id='"+ID+"'";
+            conn.setAutoCommit(false);
+            executeInsertSQL(conn, sqlStatementPhone);
+            executeInsertSQL(conn, sqlStatementMail);
+            executeInsertSQL(conn, sqlStatementPerson);
+            conn.commit();
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+        } finally {
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+    }
+
+    public static void main(String[] args) {
+        DataBase d = new DataBase();
+
+        ArrayList<String> email = new ArrayList<String>();
+        email.add("Sven4aaaadasdasdsadasd20@hotmail.com");
+        email.add("svenNyMdasdaasdasdadsil@hotmail.com");
+        ArrayList<String> phoneNums = new ArrayList<String>();
+        phoneNums.add("0701234567");
+        phoneNums.add("10742222321");
+        Address adress = new Address("Israel","Los Angeles","Storgatan","420","12345");
+
+        Person oldPerson = new Person("Sven","199909098181","Urbansson",phoneNums,email,adress);
+        Person newPerson = new Person("Sven","199909098181","svensson",phoneNums,email,adress);
+
+
+        //d.insertPerson(oldPerson);
+        //d.deletePerson(oldPerson);
+        d.updatePerson(oldPerson,newPerson);
+        /*try {
+            //d.updatePerson(oldPerson,newPerson);
+            //d.deletePerson(oldPerson);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }*/
+
+
+    }
+
 }

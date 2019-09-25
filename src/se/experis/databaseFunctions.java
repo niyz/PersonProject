@@ -129,7 +129,7 @@ public class databaseFunctions {
             }
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 	        
@@ -151,7 +151,7 @@ public class databaseFunctions {
             }
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
@@ -172,7 +172,7 @@ public class databaseFunctions {
             }
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
@@ -209,7 +209,7 @@ public class databaseFunctions {
 			try {
 				conn.rollback();
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
+
 				e1.printStackTrace();
 			}
             e.printStackTrace();
@@ -218,7 +218,7 @@ public class databaseFunctions {
 			try {
 				conn.setAutoCommit(autoCommit);
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
 		}
